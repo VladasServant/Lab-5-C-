@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <limits.h>
@@ -93,9 +93,12 @@ int main() {
             for (int j = 0; j < cols; j++) {
                 row_sum += arr[i][j];
             }
-            if (row_sum < min_sum) {
-                min_sum = row_sum;
-                min_row = i;
+        #pragma omp critical
+            {
+                if (row_sum < min_sum) {
+                    min_sum = row_sum;
+                    min_row = i;
+                }
             }
         }
         return make_pair(min_row, min_sum);
