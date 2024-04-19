@@ -6,8 +6,8 @@
 
 using namespace std;
 
-const int rows = 1000;
-const int cols = 1000;
+const int rows = 20000;
+const int cols = 20000;
 
 int arr[rows][cols];
 
@@ -27,29 +27,38 @@ int main() {
     {
     #pragma omp section
             {
-                double section_start_time = omp_get_wtime();
+                for (int i = 1; i <= 32; i *= 2) 
+                {
+                    double section_start_time = omp_get_wtime();
 
-                pair<int, long long> result = part_min(0, rows, 2);
-                int min_row = result.first;
-                long long min_sum = result.second;
+                    pair<int, long long> result = part_min(0, rows, i);
+                    int min_row = result.first;
+                    long long min_sum = result.second;
 
-                double section_end_time = omp_get_wtime();
+                    double section_end_time = omp_get_wtime();
 
-                cout << "Row with minimum sum: " << min_row
-                    << " Minimum sum: " << min_sum << endl;
-                cout << "Time for min: " << section_end_time - section_start_time
-                    << " seconds" << endl;
+                    cout << "Row with minimum sum: " << min_row
+                        << " Minimum sum: " << min_sum << endl;
+                    cout << " Thread: " << i << endl;
+                    cout << "Time for min: " << section_end_time - section_start_time
+                        << " seconds" << endl;
+                }
             }
 
     #pragma omp section
             {
-                double section_start_time = omp_get_wtime();
-                long long total_sum = part_sum(0, rows, 2);
-                double section_end_time = omp_get_wtime();
+                for (int i = 1; i <= 32; i *= 2) 
+                {
+                    double section_start_time = omp_get_wtime();
 
-                cout << "Total sum: " << total_sum << endl;
-                cout << "Time for sum: " << section_end_time - section_start_time
-                    << " seconds" << endl;
+                    long long total_sum = part_sum(0, rows, i);
+                    double section_end_time = omp_get_wtime();
+
+                    cout << "Total sum: " << total_sum << endl;
+                    cout << " Thread: " << i << endl;
+                    cout << "Time for sum: " << section_end_time - section_start_time
+                        << " seconds" << endl;
+                }
             }
         }
 
@@ -87,13 +96,13 @@ int main() {
         int min_row = start_row;
         long long min_sum = LLONG_MAX;
 
-    #pragma omp parallel for reduction(min:min_sum, min_row) num_threads(num_threads)
+    #pragma omp parallel for num_threads(num_threads)
         for (int i = start_row; i < end_row; i++) {
             long long row_sum = 0;
             for (int j = 0; j < cols; j++) {
                 row_sum += arr[i][j];
             }
-        #pragma omp critical
+    #pragma omp critical
             {
                 if (row_sum < min_sum) {
                     min_sum = row_sum;
