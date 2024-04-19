@@ -102,11 +102,13 @@ int main() {
             for (int j = 0; j < cols; j++) {
                 row_sum += arr[i][j];
             }
+            if (row_sum < min_sum) {
     #pragma omp critical
-            {
-                if (row_sum < min_sum) {
-                    min_sum = row_sum;
-                    min_row = i;
+                {
+                    if (row_sum < min_sum) {
+                        min_sum = row_sum;
+                        min_row = i;
+                    }
                 }
             }
         }
